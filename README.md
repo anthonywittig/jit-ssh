@@ -27,3 +27,22 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
   * `ssh -i PATH_TO_KEY -L 8901:localhost:8765 ubuntu@ec2...compute.amazonaws.com`
 * then connect to the forwarded port
   * `ssh -p 8901 USER_NAME@127.0.0.1`
+
+## With this program (hopefully)
+
+### AWS setup
+
+* create an S3 file that is only accessible via AWS creds for remote instructions...
+
+### Remote machine setup
+
+* configure jit-ssh
+  * edit the `.env` file
+* install jit-ssh as a service that will restart if it crashes
+  * ...
+
+### AWS
+
+* spin up instance and update instructions...
+
+...
