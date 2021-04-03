@@ -14,4 +14,13 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
 
 2. from the machine that you want to make accessible ("remote machine")
   * copy the private key over (if not already present) and `chmod 400` it
-  * connect with something like `ssh -i PATH_TO_KEY ubuntu@ec2-....compute.amazonaws.com` (you can get the address from the EC2 console by clicking on the "connect" option)
+  * remote port forward our SSH port (22) to some other port (8765 in this example) with something like
+    * `ssh -i PATH_TO_KEY -R 8765:localhost:22 ubuntu@ec2-...compute.amazonaws.com`
+    * (you can get the remote address from the EC2 colsole by clicking on the "connect" option)
+
+3. from the machine that you want to connect from ("my machine")
+  * copy the private key over (if not already present) and `chmod 400` it
+  * local port forwarded the port on the remote machine (8765) to some other local port (8901 in this example)
+    * `ssh -i PATH_TO_KEY -L 8901:localhost:8765 ubuntu@ec2...compute.amazonaws.com`
+  * then connect to the forwarded port
+    * `ssh -p 8901 USER_NAME@127.0.0.1`
