@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"testing"
 
 	"github.com/anthonywittig/jit-ssh/internal/config"
@@ -21,7 +22,7 @@ func TestApplicationExecute_callsGetConfig(t *testing.T) {
 		t.Fatalf("expected GetConfig call count to be 0 but was %d", mConfigurer.getConfigCallCount)
 	}
 
-	if _, err := app.execute(); err != nil {
+	if _, err := app.execute(context.Background()); err != nil {
 		t.Fatalf("error calling execute: %s", err.Error())
 	}
 
@@ -35,7 +36,7 @@ func TestApplicationExecute_hasRemoteIPIsRunning(t *testing.T) {
 		getConfig: func() (config.Config, error) {
 			return config.Config{
 				Remote: config.Remote{
-					IP: "192.168.0.1",
+					ConnectionString: "ubuntu@ec2-13-56-168-223.us-west-1.compute.amazonaws.com",
 				},
 			}, nil
 		},
@@ -55,7 +56,7 @@ func TestApplicationExecute_hasRemoteIPIsRunning(t *testing.T) {
 		t.Fatalf("unexpected call counts: %d, %d", mRPF.startCallCount, mRPF.runningCallCount)
 	}
 
-	if _, err := app.execute(); err != nil {
+	if _, err := app.execute(context.Background()); err != nil {
 		t.Fatalf("error calling execute: %s", err.Error())
 	}
 
@@ -69,7 +70,7 @@ func TestApplicationExecute_hasRemoteIPNotRunning(t *testing.T) {
 		getConfig: func() (config.Config, error) {
 			return config.Config{
 				Remote: config.Remote{
-					IP: "192.168.0.1",
+					ConnectionString: "ubuntu@ec2-13-56-168-223.us-west-1.compute.amazonaws.com",
 				},
 			}, nil
 		},
@@ -90,7 +91,7 @@ func TestApplicationExecute_hasRemoteIPNotRunning(t *testing.T) {
 		t.Fatalf("unexpected call counts: %d, %d", mRPF.startCallCount, mRPF.runningCallCount)
 	}
 
-	if _, err := app.execute(); err != nil {
+	if _, err := app.execute(context.Background()); err != nil {
 		t.Fatalf("error calling execute: %s", err.Error())
 	}
 
@@ -104,7 +105,7 @@ type mockConfigurer struct {
 	getConfigCallCount int
 }
 
-func (m *mockConfigurer) GetConfig() (config.Config, error) {
+func (m *mockConfigurer) GetConfig(ctx context.Context) (config.Config, error) {
 	if m.getConfig == nil {
 		panic("need to set up the mock")
 	}
@@ -119,7 +120,7 @@ type mockRPF struct {
 	runningCallCount int
 }
 
-func (m *mockRPF) Start() error {
+func (m *mockRPF) Start(cfg config.Config) error {
 	if m.start == nil {
 		panic("need to set up the mock")
 	}

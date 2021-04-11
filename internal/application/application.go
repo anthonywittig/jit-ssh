@@ -20,11 +20,11 @@ type Context struct {
 }
 
 type Configurer interface {
-	GetConfig() (config.Config, error)
+	GetConfig(context.Context) (config.Config, error)
 }
 
 type RemotePortForwarder interface {
-	Start() error
+	Start(config.Config) error
 	Running() bool
 }
 
@@ -35,7 +35,7 @@ func New(ac Context) (*Application, error) {
 }
 
 func (a *Application) Run(ctx context.Context) error {
-	ticker := time.NewTicker(1 * time.Millisecond)
+	ticker := time.NewTicker(500 * time.Millisecond)
 
 	for {
 		select {
@@ -43,7 +43,7 @@ func (a *Application) Run(ctx context.Context) error {
 			log.Printf("context says it's time to quit, ending run loop")
 			return nil
 		case <-ticker.C:
-			nextDelay, err := a.execute()
+			nextDelay, err := a.execute(ctx)
 			if err != nil {
 				return errors.New(fmt.Sprintf("error on app execute: %s", err.Error()))
 			}
@@ -52,22 +52,21 @@ func (a *Application) Run(ctx context.Context) error {
 	}
 }
 
-func (a *Application) execute() (time.Duration, error) {
-	conf, err := a.c.Configurer.GetConfig()
+func (a *Application) execute(ctx context.Context) (time.Duration, error) {
+	conf, err := a.c.Configurer.GetConfig(ctx)
 	if err != nil {
-		return 0, errors.New(fmt.Sprintf("error getting config: %s", err.Error()))
+		return 250 * time.Millisecond, errors.New(fmt.Sprintf("error getting config: %s", err.Error()))
 	}
-	log.Printf("-- config: %+v", conf)
 
-	if conf.Remote.IP == "" {
+	if conf.Remote.ConnectionString == "" {
 		return 10 * time.Minute, nil
 	}
 
 	// Could we ever get in a state where we're "running" forever?
 	if a.c.RemotePortForwarder.Running() {
-		return 5 * time.Minute, nil
+		return 10 * time.Minute, nil
 	}
 
-	a.c.RemotePortForwarder.Start()
+	a.c.RemotePortForwarder.Start(conf)
 	return 1 * time.Minute, nil
 }

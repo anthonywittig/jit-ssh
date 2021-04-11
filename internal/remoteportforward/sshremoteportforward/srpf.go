@@ -5,15 +5,22 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strings"
 	"time"
+
+	"github.com/anthonywittig/jit-ssh/internal/config"
 )
 
 type SSHRemotePortForwarder struct {
 	cmd                 *exec.Cmd
-	commandRunningSince time.Time
+	commandRunningSince time.Time // We're not being thread safe with this...
 }
 
-func (s *SSHRemotePortForwarder) Start() error {
+type Output struct {
+	level string
+}
+
+func (s *SSHRemotePortForwarder) Start(c config.Config) error {
 	if s.Running() {
 		log.Println("shouldn't start another process while the first is running; trying to kill it")
 		if err := s.Stop(); err != nil {
@@ -23,15 +30,24 @@ func (s *SSHRemotePortForwarder) Start() error {
 	}
 
 	log.Println("starting ssh remote port forward")
-	log.Println("  (implement me!)")
 
 	go func() {
 		s.commandRunningSince = time.Now()
 
-		s.cmd = exec.Command("sleep", "5")
+		// We sleep for an hour to keep the command from exiting.
+		command := fmt.Sprintf(`ssh -i %s -o "StrictHostKeyChecking no" -R %d:localhost:22 %s 'sleep 1h'`, c.Local.SSH.PathToKey, c.Local.SSH.PortToOpen, c.Remote.ConnectionString)
+		log.Printf("going to execute something like: %s", command)
+
+		s.cmd = exec.Command("bash", "-s")
+		s.cmd.Stdin = strings.NewReader(command)
+
+		s.cmd.Stdout = Output{level: "INFO"}
+		s.cmd.Stderr = Output{level: "ERROR"}
+
 		if err := s.cmd.Run(); err != nil {
 			log.Printf("error running process (might not be a bad thing): %s", err.Error())
 		}
+		log.Printf("command exited")
 
 		s.commandRunningSince = time.Time{}
 	}()
@@ -49,4 +65,9 @@ func (s *SSHRemotePortForwarder) Stop() error {
 	}
 	s.commandRunningSince = time.Time{}
 	return nil
+}
+
+func (o Output) Write(b []byte) (int, error) {
+	log.Printf("CMD OUTPUT %s - %s", o.level, string(b))
+	return len(b), nil
 }

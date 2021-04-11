@@ -2,17 +2,14 @@ package main
 
 import (
 	"context"
-	_ "embed"
 	"errors"
 	"fmt"
 	"log"
 
 	"github.com/anthonywittig/jit-ssh/internal/application"
 	"github.com/anthonywittig/jit-ssh/internal/config/s3configurer"
+	"github.com/anthonywittig/jit-ssh/internal/remoteportforward/sshremoteportforward"
 )
-
-//go:embed .env.json
-var embededLocalConfig []byte
 
 func main() {
 	if err := run(); err != nil {
@@ -23,13 +20,14 @@ func main() {
 func run() error {
 	ctx := context.Background()
 
-	configurer, err := s3configurer.New(ctx, embededLocalConfig)
+	configurer, err := s3configurer.New(ctx)
 	if err != nil {
 		return errors.New(fmt.Sprintf("error getting configurer: %s", err.Error()))
 	}
 
 	app, err := application.New(application.Context{
-		Configurer: configurer,
+		Configurer:          configurer,
+		RemotePortForwarder: &sshremoteportforward.SSHRemotePortForwarder{},
 	})
 	if err != nil {
 		return errors.New(fmt.Sprintf("error getting application: %s", err.Error()))
