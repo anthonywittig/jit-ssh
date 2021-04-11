@@ -28,7 +28,7 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
 * then connect to the forwarded port
   * `ssh -p 8901 USER_NAME@127.0.0.1`
 
-## With this program (hopefully)
+## With this program
 
 ### AWS setup
 
