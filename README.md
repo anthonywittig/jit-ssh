@@ -45,7 +45,7 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
     * be sure to save the `portToOpen` as you'll need this in a couple of months from now when you need to connect
 * install jit-ssh as a service that will restart if it crashes
   * it's probably a good idea to namespace jit-ssh so that you can upgrade without killing the service, e.g. `/usr/local/jit-ssh/[DATE]/`
-  * actual command to run as a service...
+  * install and run as a service - see `jit-ssh.service` for more information
 
 ### When ready to connect
 
