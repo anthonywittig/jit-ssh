@@ -47,6 +47,7 @@ func (a *Application) Run(ctx context.Context) error {
 			if err != nil {
 				return errors.New(fmt.Sprintf("error on app execute: %s", err.Error()))
 			}
+			log.Printf("sleeping for %.1f minutes", nextDelay.Minutes())
 			ticker.Reset(nextDelay)
 		}
 	}
@@ -55,7 +56,7 @@ func (a *Application) Run(ctx context.Context) error {
 func (a *Application) execute(ctx context.Context) (time.Duration, error) {
 	conf, err := a.c.Configurer.GetConfig(ctx)
 	if err != nil {
-		return 250 * time.Millisecond, errors.New(fmt.Sprintf("error getting config: %s", err.Error()))
+		return -1, errors.New(fmt.Sprintf("error getting config: %s", err.Error()))
 	}
 
 	if conf.Remote.ConnectionString == "" {

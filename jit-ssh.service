@@ -1,0 +1,20 @@
+# https://www.raspberrypi.org/documentation/linux/usage/systemd.md
+
+# Update the name of the file to include the [DATE] to make the service unique.
+
+[Unit]
+Description=jit-ssh
+After=network.target
+
+[Service]
+# Update the [DATE]
+ExecStart=/usr/local/jit-ssh/[DATE]/jit-ssh
+# Update the [DATE]
+WorkingDirectory=/usr/local/jit-ssh/[DATE]/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
