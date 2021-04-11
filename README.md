@@ -32,17 +32,26 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
 
 ### AWS setup
 
-* create an S3 file that is only accessible via AWS creds for remote instructions...
+* create a private S3 bucket and upload the remote config there (see the `example.env.remote.json`)
+* create a new IAM (group and/or just) user that can access the remote config
+  * copy the user credentials to the remote machine (in `~/.aws/credentails`)
+* create an EC2 Key Pair
+  * you'll need the .pem file on the local and remote machines since they'll both use it to connect to the middle man
 
 ### Remote machine setup
 
 * configure jit-ssh
-  * edit the `.env` file
+  * create an `.env.json` file (based off of the `.example.env.json)
+    * be sure to save the `portToOpen` as you'll need this in a couple of months from now when you need to connect
 * install jit-ssh as a service that will restart if it crashes
-  * ...
+  * it's probably a good idea to namespace jit-ssh so that you can upgrade without killing the service, e.g. `/usr/local/jit-ssh/[DATE]/`
+  * actual command to run as a service...
 
-### AWS
+### When ready to connect
 
-* spin up instance and update instructions...
-
-...
+* spin up EC2 instance and update the remote config to have the connection string (e.g. `ubuntu@ec2-...compute.amazonaws.com`)
+* on your local machine
+  * `ssh -i PATH_TO_KEY -L 8901:localhost:8765 ubuntu@ec2...compute.amazonaws.com`
+    * the first port number (8901) can be anything you want - it's the local port you'll use in a minute
+    * the second port number (8765) must match the `.env.json` that exists on the remote machine - at this point you should pray that you recorded it somewhere or are using the default
+  * with the above command running, open a second termainal and run `ssh -p 8901 USER_NAME@127.0.0.1`
