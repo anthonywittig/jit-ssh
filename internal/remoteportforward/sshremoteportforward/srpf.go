@@ -35,6 +35,7 @@ func (s *SSHRemotePortForwarder) Start(c config.Config) error {
 		s.commandRunningSince = time.Now()
 
 		// The sleep seems to help it not exit immediately, but I'm not sure what it really does since it seems to stay connected longer than the sleep time.
+		// Next time you're in here, consider having the remote command be something that echos the uptime every so often.
 		command := fmt.Sprintf(`ssh -i %s -o "StrictHostKeyChecking no" -R %d:localhost:22 %s 'sleep 1m'`, c.Local.SSH.PathToKey, c.Local.SSH.PortToOpen, c.Remote.ConnectionString)
 		log.Printf("going to execute something like: %s", command)
 
