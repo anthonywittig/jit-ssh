@@ -17,8 +17,7 @@ type AWS struct {
 }
 
 type SSH struct {
-	PathToKey  string `json"pathToKey"`
-	PortToOpen int    `json"portToOpen"`
+	PathToKey string `json:"pathToKey"`
 }
 
 type S3 struct {
@@ -28,4 +27,5 @@ type S3 struct {
 
 type Remote struct {
 	ConnectionString string `json:"connectionString"`
+	PortToOpen       int    `json:"portToOpen"`
 }
