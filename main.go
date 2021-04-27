@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/anthonywittig/jit-ssh/internal/application"
 	"github.com/anthonywittig/jit-ssh/internal/config/s3configurer"
@@ -12,8 +13,11 @@ import (
 )
 
 func main() {
-	if err := run(); err != nil {
-		log.Fatalf("error running application: %s", err.Error())
+	for {
+		if err := run(); err != nil {
+			log.Fatalf("error running application (sleeping for a minute): %s", err.Error())
+		}
+		time.Sleep(time.Minute)
 	}
 }
 

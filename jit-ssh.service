@@ -5,6 +5,7 @@
 [Unit]
 Description=jit-ssh
 After=network.target
+StartLimitIntervalSec=0
 
 [Service]
 # Update the [DATE]
@@ -14,6 +15,7 @@ WorkingDirectory=/usr/local/jit-ssh/[DATE]/
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
+RestartSec=300
 User=pi
 
 [Install]
