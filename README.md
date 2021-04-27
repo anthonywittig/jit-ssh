@@ -42,8 +42,6 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
 
 * configure jit-ssh
   * create an `.env.json` file (based off of the `.example.env.json)
-    * be sure to save the `portToOpen` as you'll need this in a couple of months from now when you need to connect
-      * (TODO: move `portToOpen` from the local config to the remote config)
 * install jit-ssh as a service that will restart if it crashes
   * it's probably a good idea to namespace jit-ssh so that you can upgrade without killing the service, e.g. `/usr/local/jit-ssh/[DATE]/`
   * install and run as a service - see `jit-ssh.service` for more information
@@ -54,6 +52,6 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
 * on your local machine
   * `ssh -i PATH_TO_KEY -L 8901:localhost:8765 ubuntu@ec2...compute.amazonaws.com`
     * the first port number (8901) can be anything you want - it's the local port you'll use in a minute
-    * the second port number (8765) must match the `.env.json` that exists on the remote machine - at this point you should pray that you recorded it somewhere or are using the default
+    * the second port number (8765) must match the `env.remote.json`
     * this command can appear to work until you run the next, at which point it might say something like `channel 3: open failed: connect failed: Connection refused` - that probably means you're using the wrong port or the remote machine hasn't remote port forwarded
   * with the above command running, open a second termainal and run `ssh -p 8901 USER_NAME@127.0.0.1`
