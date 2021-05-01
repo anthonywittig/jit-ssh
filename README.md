@@ -55,3 +55,8 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
     * the second port number (8765) must match the `env.remote.json`
     * this command can appear to work until you run the next, at which point it might say something like `channel 3: open failed: connect failed: Connection refused` - that probably means you're using the wrong port or the remote machine hasn't remote port forwarded
   * with the above command running, open a second termainal and run `ssh -p 8901 USER_NAME@127.0.0.1`
+
+Debugging:
+* on the middleman, install netstate `sudo apt install net-tools` and run `sudo netstat -lntu`. If the remote machine has connected you'll see:
+  * `tcp        0      0 127.0.0.1:8765          0.0.0.0:*               LISTEN`
+  * `tcp6       0      0 ::1:8765                :::*                    LISTEN`
