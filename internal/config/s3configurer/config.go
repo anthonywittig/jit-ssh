@@ -10,9 +10,9 @@ import (
 
 	"github.com/anthonywittig/jit-ssh/internal/config"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go/aws"
 )
 
 type S3Configurer struct {
