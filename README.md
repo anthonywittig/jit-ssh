@@ -48,7 +48,8 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
 
 ### When ready to connect
 
-* spin up EC2 instance and update the remote config to have the connection string (e.g. `ubuntu@ec2-...compute.amazonaws.com`)
+* spin up EC2 instance
+* update the remote config to have the connection string (e.g. `ubuntu@ec2-...compute.amazonaws.com`)
 * on your local machine
   * `ssh -i PATH_TO_KEY -L 8901:localhost:8765 ubuntu@ec2...compute.amazonaws.com`
     * the first port number (8901) can be anything you want - it's the local port you'll use in a minute
