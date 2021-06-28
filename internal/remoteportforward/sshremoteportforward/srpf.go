@@ -1,7 +1,6 @@
 package sshremoteportforward
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -61,8 +60,10 @@ func (s *SSHRemotePortForwarder) Running() bool {
 }
 
 func (s *SSHRemotePortForwarder) Stop() error {
-	if err := s.cmd.Process.Kill(); err != nil {
-		return errors.New(fmt.Sprintf("error killing running process, not sure what to do, probably best to continue: %s", err.Error()))
+	if s.cmd != nil {
+		if err := s.cmd.Process.Kill(); err != nil {
+			return fmt.Errorf("error killing running process, not sure what to do, probably best to continue: %s", err.Error())
+		}
 	}
 	s.commandRunningSince = time.Time{}
 	return nil

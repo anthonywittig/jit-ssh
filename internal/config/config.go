@@ -1,5 +1,12 @@
 package config
 
+import (
+	"crypto/sha1"
+	"encoding/json"
+	"fmt"
+	"io"
+)
+
 type Config struct {
 	Local  Local
 	Remote Remote
@@ -28,4 +35,19 @@ type S3 struct {
 type Remote struct {
 	ConnectionString string `json:"connectionString"`
 	PortToOpen       int    `json:"portToOpen"`
+}
+
+func (c Config) Hash() (string, error) {
+	h := sha1.New()
+
+	j, err := json.Marshal(c)
+	if err != nil {
+		return "", fmt.Errorf("error marshalling: %s", err.Error())
+	}
+
+	if _, err := io.WriteString(h, fmt.Sprintf("json: %s", j)); err != nil {
+		return "", fmt.Errorf("error writing json: %s", err.Error())
+	}
+
+	return string(h.Sum(nil)), nil
 }

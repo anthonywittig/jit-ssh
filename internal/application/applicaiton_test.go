@@ -11,8 +11,12 @@ func TestApplicationExecute_callsGetConfig(t *testing.T) {
 	mConfigurer := &mockConfigurer{
 		getConfig: func() (config.Config, error) { return config.Config{}, nil },
 	}
+	mRPF := &mockRPF{
+		stop: func() error { return nil },
+	}
 	app, err := New(Context{
-		Configurer: mConfigurer,
+		Configurer:          mConfigurer,
+		RemotePortForwarder: mRPF,
 	})
 	if err != nil {
 		t.Fatalf("error getting app: %s", err.Error())
@@ -114,10 +118,20 @@ func (m *mockConfigurer) GetConfig(ctx context.Context) (config.Config, error) {
 }
 
 type mockRPF struct {
-	start            func() error
-	startCallCount   int
 	running          func() bool
 	runningCallCount int
+	start            func() error
+	startCallCount   int
+	stop             func() error
+	stopCallCount    int
+}
+
+func (m *mockRPF) Running() bool {
+	if m.running == nil {
+		panic("need to set up the mock")
+	}
+	m.runningCallCount++
+	return m.running()
 }
 
 func (m *mockRPF) Start(cfg config.Config) error {
@@ -128,10 +142,10 @@ func (m *mockRPF) Start(cfg config.Config) error {
 	return m.start()
 }
 
-func (m *mockRPF) Running() bool {
-	if m.running == nil {
+func (m *mockRPF) Stop() error {
+	if m.stop == nil {
 		panic("need to set up the mock")
 	}
-	m.runningCallCount++
-	return m.running()
+	m.stopCallCount++
+	return m.stop()
 }

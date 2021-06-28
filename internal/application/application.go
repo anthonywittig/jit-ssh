@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -24,8 +23,9 @@ type Configurer interface {
 }
 
 type RemotePortForwarder interface {
-	Start(config.Config) error
 	Running() bool
+	Start(config.Config) error
+	Stop() error
 }
 
 func New(ac Context) (*Application, error) {
@@ -45,7 +45,7 @@ func (a *Application) Run(ctx context.Context) error {
 		case <-ticker.C:
 			nextDelay, err := a.execute(ctx)
 			if err != nil {
-				return errors.New(fmt.Sprintf("error on app execute: %s", err.Error()))
+				return fmt.Errorf("error on app execute: %s", err.Error())
 			}
 			log.Printf("sleeping for %.1f minutes", nextDelay.Minutes())
 			ticker.Reset(nextDelay)
@@ -56,18 +56,23 @@ func (a *Application) Run(ctx context.Context) error {
 func (a *Application) execute(ctx context.Context) (time.Duration, error) {
 	conf, err := a.c.Configurer.GetConfig(ctx)
 	if err != nil {
-		return -1, errors.New(fmt.Sprintf("error getting config: %s", err.Error()))
+		return -1, fmt.Errorf("error getting config: %s", err.Error())
 	}
 
 	if conf.Remote.ConnectionString == "" {
+		if err := a.c.RemotePortForwarder.Stop(); err != nil {
+			return -1, fmt.Errorf("error trying to stop port forwarder: %s", err.Error())
+		}
 		return 10 * time.Minute, nil
 	}
 
 	// Could we ever get in a state where we're "running" forever?
 	if a.c.RemotePortForwarder.Running() {
-		return 10 * time.Minute, nil
+		return 5 * time.Minute, nil
 	}
 
-	a.c.RemotePortForwarder.Start(conf)
+	if err := a.c.RemotePortForwarder.Start(conf); err != nil {
+		return -1, fmt.Errorf("error trying to start port forwarder: %s", err.Error())
+	}
 	return 1 * time.Minute, nil
 }
