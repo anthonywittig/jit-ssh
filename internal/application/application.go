@@ -63,16 +63,17 @@ func (a *Application) execute(ctx context.Context) (time.Duration, error) {
 		if err := a.c.RemotePortForwarder.Stop(); err != nil {
 			return -1, fmt.Errorf("error trying to stop port forwarder: %s", err.Error())
 		}
-		return 10 * time.Minute, nil
+		return 5 * time.Minute, nil
 	}
 
 	// Could we ever get in a state where we're "running" forever?
 	if a.c.RemotePortForwarder.Running() {
-		return 5 * time.Minute, nil
+		return 1 * time.Minute, nil
 	}
 
 	if err := a.c.RemotePortForwarder.Start(conf); err != nil {
 		return -1, fmt.Errorf("error trying to start port forwarder: %s", err.Error())
 	}
+
 	return 1 * time.Minute, nil
 }

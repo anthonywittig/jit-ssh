@@ -62,3 +62,11 @@ You want to SSH into a machine that is unreachable. This program will SSH into a
 * on the middleman, install netstate `sudo apt install net-tools` and run `sudo netstat -lntu`. If the remote machine has connected you'll see:
   * `tcp        0      0 127.0.0.1:8765          0.0.0.0:*               LISTEN`
   * `tcp6       0      0 ::1:8765                :::*                    LISTEN`
+
+
+## Upgrading In-Place
+
+* Create a new date based folder (see service file for examples)
+* Copy over the binary, service file, and `.env.json`
+* Update the `.env.json` and service file
+* ...
