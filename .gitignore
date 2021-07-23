@@ -15,4 +15,6 @@
 # vendor/
 
 .env.json
+env.remote.json
 .aws.credentials
+jit-ssh
